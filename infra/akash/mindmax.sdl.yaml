@@ -1,0 +1,48 @@
+version: "2.0"
+
+services:
+  mindmax:
+    image: mindmax:vgpu-latest
+    expose:
+      - port: 8080
+        as: 80
+        to:
+          - global
+      - port: 9090
+        as: 443
+        to:
+          - global
+    env:
+      - CUDA_VISIBLE_DEVICES=0
+    resources:
+      cpu:
+        units: 2
+      memory:
+        size: 4Gi
+      gpu:
+        units: 1
+      storage:
+        size: 2Gi
+profiles:
+  compute:
+    mindmax:
+      resources:
+        cpu:
+          units: 2
+        memory:
+          size: 4Gi
+        gpu:
+          units: 1
+        storage:
+          size: 2Gi
+  placement:
+    dcloud:
+      pricing:
+        mindmax:
+          denom: uakt
+          amount: 1000
+deployment:
+  mindmax:
+    dcloud:
+      profile: mindmax
+      count: 1
