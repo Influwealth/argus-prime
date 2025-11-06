@@ -1,0 +1,29 @@
+capsule:
+  # Metadata
+  name: youtube-oauth-check
+  version: "1.1"
+  author: "Influwealth Quantum Labs"
+  description: |
+    Administrative directive to confirm and prepare YouTube OAuth credentials for 
+    automated content publishing and analytics integration. This ensures the 
+    Sovereign Capsule can securely access the Google API without manual intervention.
+
+  # External Dependency Identification (REQUIRED for compliance tracking)
+  external_project: myappanalytics-a01b7
+  billing_account: 01316F-74A7CB-7766ED
+
+  # Trigger this capsule prepares the system for
+  prepares_for_trigger: publish_youtube
+
+  # Programmatic Checklist for the Argus Agent to execute (YAML Key: Expected Value)
+  checklist:
+    # Google Cloud Console Verification
+    oauth_client_id_exists: true
+    redirect_uri: "http://localhost:8080/"
+    required_scopes:
+      - "https://www.googleapis.com/auth/youtube.upload"
+      - "https://www.googleapis.com/auth/youtube.readonly" # Added for safety/analytics
+
+    # Security & VaultGemma Readiness Check
+    secrets_file_prepared: "client_secrets.json"
+    vaultgemma_key_exists: "youtube_client_secrets" # Expected key name in VaultGemma

@@ -1,0 +1,24 @@
+capsule:
+  # Metadata for tracking and deployment
+  version: "1.0"
+  author: "Argus Prime Agent"
+  name: wealthbridge
+  description: |
+    Matches users to credit cards, grants, contracts, and housing aid using 
+    high-dimensional tensor logic and Google Data Commons data.
+    
+  # The Python file executed when the capsule is triggered
+  entrypoint: agents/argus/wealthbridge.py
+  
+  # Dependent modules required by the entrypoint script
+  dependencies:
+    # 1. Used for fetching API keys (like Google Data Commons) securely from VaultGemma
+    - agents/vaultgemma/secure_comm.py
+    # 2. Used for routing the complex 'tensor logic' calculations to TWA/vGPU compute backends
+    - quantum_internet/quantum_adapter.py
+    
+  # The specific functions or modes this capsule exposes for users/affiliates to trigger
+  triggers:
+    - credit_analysis
+    - grant_match
+    - housing_aid # Corrected from housing_ai for clarity and consistency
