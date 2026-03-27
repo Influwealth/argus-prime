@@ -32,4 +32,5 @@ class MindMaxAPI(FastAPI):
                 return {"response": f"NIM processed: {prompt[:20]}..."}
             return {"response": "Service unhealthy."}
 
+if __name__ == "__main__":
     app = MindMaxAPI()
