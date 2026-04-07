@@ -1,0 +1,5 @@
+# Production dependencies for Argus Prime
+
+# Please list your production dependencies here.
+# Example:
+# package-name==version
