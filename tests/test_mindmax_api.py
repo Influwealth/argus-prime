@@ -71,6 +71,40 @@ class TestGenerateEndpoint:
         assert resp.status_code == 200
 
 
+class TestAgentEndpoint:
+    def test_returns_200(self, client):
+        resp = client.post("/agent", json={"query": "run credit analysis"})
+        assert resp.status_code == 200
+
+    def test_routes_credit_to_wealthbridge(self, client):
+        resp = client.post("/agent", json={"query": "run credit analysis"})
+        assert resp.json()["capsule"] == "wealthbridge"
+
+    def test_routes_unknown_to_deepagent(self, client):
+        resp = client.post("/agent", json={"query": "something completely unknown"})
+        assert resp.json()["capsule"] == "deepagent"
+
+    def test_routes_predict_to_prediction_engine(self, client):
+        resp = client.post("/agent", json={"query": "predict my outcome"})
+        assert resp.json()["capsule"] == "prediction_engine"
+
+    def test_status_is_dispatched(self, client):
+        resp = client.post("/agent", json={"query": "simulate portfolio"})
+        assert resp.json()["status"] == "dispatched"
+
+    def test_session_id_is_present(self, client):
+        resp = client.post("/agent", json={"query": "quantum optimize"})
+        assert "session_id" in resp.json()
+
+    def test_missing_query_returns_422(self, client):
+        resp = client.post("/agent", json={})
+        assert resp.status_code == 422
+
+    def test_context_field_is_optional(self, client):
+        resp = client.post("/agent", json={"query": "invoice needed"})
+        assert resp.status_code == 200
+
+
 class TestMindMaxAPIMetadata:
     def test_api_title(self, app):
         assert app.title == "MindMax Core API"

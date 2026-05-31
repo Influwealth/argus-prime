@@ -1,0 +1,15 @@
+capsule:
+  name: prediction_engine
+  version: "1.0"
+  author: "Argus Prime Agent"
+  description: |
+    Analytical prediction capsule. Scores risk, predicts outcomes, and suggests
+    actions using WebLLM MCP, CBI Insights MCP, and the ICP Caffeine Agent stub.
+  entrypoint: agents/prediction_engine/capsule.py
+  dependencies:
+    - mcp/clients/web_llm.py
+    - mcp/clients/cbi_insights.py
+  triggers:
+    - predict_outcome
+    - score_risk
+    - suggest_action

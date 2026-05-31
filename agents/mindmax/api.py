@@ -1,6 +1,15 @@
 import logging
 from fastapi import FastAPI
+from pydantic import BaseModel
 from agents.mindmax.nim.nim_client import NIMClient
+from router import CapsuleRouter
+from session import runAgentSession
+
+
+class AgentRequest(BaseModel):
+    query: str
+    context: dict = {}
+
 
 class MindMaxAPI(FastAPI):
     """
@@ -13,6 +22,7 @@ class MindMaxAPI(FastAPI):
             description="NIM-accelerated, vGPU-optimized Agent Service."
         )
         self.nim_client = NIMClient(endpoint="https://nim.internal")
+        self.capsule_router = CapsuleRouter()
         self.startup_check()
         self.add_routes()
 
@@ -31,6 +41,11 @@ class MindMaxAPI(FastAPI):
             if self.nim_client.is_healthy():
                 return {"response": f"NIM processed: {prompt[:20]}..."}
             return {"response": "Service unhealthy."}
+
+        @self.post("/agent")
+        async def agent_endpoint(request: AgentRequest):
+            capsule = self.capsule_router.predict_route(request.query)
+            return runAgentSession(capsule, {"query": request.query, "context": request.context})
 
 if __name__ == "__main__":
     app = MindMaxAPI()

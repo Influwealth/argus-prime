@@ -7,7 +7,11 @@ class CapsuleRouter:
             "credit": "wealthbridge",
             "simulation": "mindmax",
             "outreach": "bridgebuilder",
-            "quantum": "argus-prime"
+            "quantum": "argus-prime",
+            "predict": "prediction_engine",
+            "risk": "prediction_engine",
+            "invoice": "wealthbridge",
+            "cashflow": "wealthbridge",
         }
 
     def predict_route(self, query: str) -> str:

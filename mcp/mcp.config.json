@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "registry": [
+    {"name": "robinhood",      "env_url": "ROBINHOOD_MCP_URL",      "enabled": true},
+    {"name": "coinbase",       "env_url": "COINBASE_MCP_URL",       "enabled": true},
+    {"name": "telegram",       "env_url": "TELEGRAM_MCP_URL",       "enabled": true},
+    {"name": "shopify",        "env_url": "SHOPIFY_MCP_URL",        "enabled": true},
+    {"name": "web_llm",        "env_url": "WEB_LLM_MCP_URL",        "enabled": true},
+    {"name": "turbo_quantum",  "env_url": "TURBO_QUANTUM_MCP_URL",  "enabled": true},
+    {"name": "cbi_insights",   "env_url": "CBI_INSIGHTS_MCP_URL",   "enabled": true},
+    {"name": "x402",           "env_url": "X402_MCP_URL",           "enabled": true},
+    {"name": "whisper",        "env_url": "WHISPER_MCP_URL",        "enabled": true},
+    {"name": "openjarvis",     "env_url": "OPENJARVIS_MCP_URL",     "enabled": true}
+  ]
+}
