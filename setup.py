@@ -11,6 +11,7 @@ setup(
         "agents.argus",
         "agents.vaultgemma",
         "agents.prediction_engine",
+        "deepflex",
         "mcp",
         "mcp.clients",
         "mobile",

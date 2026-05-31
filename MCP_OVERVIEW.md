@@ -1,19 +1,28 @@
 # MCP (Model Context Protocol) Registry — Overview
 
-## Purpose
+## Role in the Hierarchy
 
-The MCP registry provides a unified, config-driven interface to all external
-service integrations used by ARGUS-PRIME capsules. All clients are currently
-stubbed — replace the method bodies with live SDK/HTTP calls once credentials
-and endpoints are available.
+**DeepFlex** decides *which* MCP calls to make and *when*.
+**Argus** executes those calls and returns results.
+
+MCP clients live in `mcp/clients/` and are invoked by Argus capsules
+(WealthBridge, Prediction Engine, etc.) as part of executing a DeepFlexCommand.
+They are never called directly by DeepFlex.
+
+```
+DeepFlex  ──dispatch──▶  Argus  ──capsule──▶  PredictionEngine
+                                                    │
+                                                    ├── web_llm MCP
+                                                    └── cbi_insights MCP
+```
 
 ---
 
 ## Configuration
 
-**`mcp/mcp.config.json`** — the single source of truth for registered integrations.
+**`mcp/mcp.config.json`** — single source of truth for registered integrations.
 
-Each entry maps a client name to an environment variable that holds its endpoint URL:
+Each entry maps a client name to an environment variable that holds its endpoint:
 
 ```json
 {
@@ -34,16 +43,11 @@ At runtime, `load_mcp_config()` resolves `env_url` → `endpoint` via `os.enviro
 ```python
 from mcp.loader import load_mcp_config, get_client
 
-# Get the full resolved config
-config = load_mcp_config()
-
-# Instantiate a named client
-client = get_client("robinhood")
-portfolio = client.get_portfolio()
+config = load_mcp_config()        # full resolved config
+client = get_client("robinhood")  # instantiates RobinhoodMCPClient
 ```
 
-`get_client(name)` dynamically imports and instantiates the correct class.
-It raises `ValueError` for unknown client names.
+`get_client(name)` raises `ValueError` for unknown names.
 
 ---
 
@@ -64,12 +68,12 @@ It raises `ValueError` for unknown client names.
 
 ---
 
-## Capsule Integrations
+## Which Capsule Uses Which MCP
 
-| Capsule | Uses |
+| Capsule | MCP clients used |
 |---|---|
 | `prediction_engine` | `web_llm`, `cbi_insights` |
-| `wealthbridge` | `prediction_engine` (which uses `web_llm`, `cbi_insights`) |
+| `wealthbridge` | via prediction_engine (`web_llm`, `cbi_insights`) |
 | `local_llm/whisper_coreml` | `whisper` (remote fallback when CoreML unavailable) |
 
 ---
@@ -77,7 +81,7 @@ It raises `ValueError` for unknown client names.
 ## Adding a New MCP Client
 
 1. Add an entry to `mcp/mcp.config.json`
-2. Add an env var to `.env.example`
-3. Create `mcp/clients/<name>.py` with a class following the existing pattern
-4. Register the class path in `_CLIENT_MAP` in `mcp/loader.py`
+2. Add the env var to `.env.example`
+3. Create `mcp/clients/<name>.py` following the existing stub pattern
+4. Register the dotted class path in `_CLIENT_MAP` in `mcp/loader.py`
 5. Add tests to `tests/test_mcp_loader.py`

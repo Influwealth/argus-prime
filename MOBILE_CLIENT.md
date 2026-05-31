@@ -1,9 +1,18 @@
-# ARGUS-PRIME Mobile Client Layer
+# Argus-Mobile Client Layer
 
-## Purpose
+## Role in the Hierarchy
 
-`mobile/client.py` provides a thin, retry-safe HTTP client for sending agent
-requests from mobile or edge environments to the ARGUS-PRIME API.
+```
+DeepFlex  ──orchestrates──▶  Argus Prime (this repo)
+                                     ▲
+                              (local ops only)
+                                     │
+                           Argus-Mobile (iOS/Android)
+```
+
+Argus-Mobile is the iOS/Android client layer. It communicates directly with the
+Argus node for device-level and local operations. High-level orchestration still
+flows through DeepFlex.
 
 ---
 
@@ -13,7 +22,7 @@ requests from mobile or edge environments to the ARGUS-PRIME API.
 from mobile.client import sendToArgusPrime
 
 result = sendToArgusPrime({
-    "query": "run credit analysis for federal worker",
+    "query": "run credit analysis",
     "context": {"user_id": "u123", "region": "CA"}
 })
 
@@ -24,11 +33,11 @@ print(result["status"])     # "dispatched"
 
 ---
 
-## Configuration (Environment Variables)
+## Configuration
 
 | Variable | Default | Description |
 |---|---|---|
-| `ARGUS_PRIME_URL` | `http://localhost:8080` | Base URL of the ARGUS-PRIME API |
+| `ARGUS_PRIME_URL` | `http://localhost:8080` | Base URL of the Argus node |
 | `ARGUS_CLIENT_TIMEOUT` | `10` | Request timeout in seconds |
 | `ARGUS_CLIENT_RETRIES` | `3` | Max retry attempts on connection failure |
 
@@ -38,15 +47,14 @@ print(result["status"])     # "dispatched"
 
 `sendToArgusPrime` uses **exponential backoff** on connection errors and timeouts:
 
-| Attempt | Delay before next |
+| Attempt | Delay before retry |
 |---|---|
 | 1 | 2s |
 | 2 | 4s |
 | 3 | 8s |
 | 4 (final) | — |
 
-HTTP errors (4xx/5xx) are **not retried** — they return an error dict immediately
-since retrying is unlikely to help.
+HTTP errors (4xx/5xx) are **not retried** — they return an error dict immediately.
 
 ---
 
@@ -74,9 +82,9 @@ On failure:
 
 ---
 
-## CoreML / Local Inference
+## On-Device Inference (CoreML)
 
-For on-device inference on Apple Silicon, see `local_llm/`:
+For Apple Silicon on-device inference, bypass the Argus network call entirely:
 
 ```python
 from local_llm.coreml import runLocalLLM
@@ -86,5 +94,5 @@ text = runLocalLLM("Summarize my portfolio risk")
 transcript = transcribeAudio("/tmp/voice_note.m4a", language="en")
 ```
 
-Both functions are stubs — replace the bodies with CoreML/MLX or WhisperKit
-bindings when targeting iOS/macOS.
+Both are stubs — replace bodies with CoreML/MLX or WhisperKit bindings when
+targeting iOS/macOS. On-device results can then be forwarded to Argus if needed.

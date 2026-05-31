@@ -37,7 +37,7 @@ class TestHealthEndpoint:
 
     def test_returns_service_name(self, client):
         resp = client.get("/health")
-        assert resp.json()["service"] == "MindMax Core"
+        assert resp.json()["service"] == "Argus Prime"
 
     def test_health_is_always_available_regardless_of_nim(self, unhealthy_client):
         resp = unhealthy_client.get("/health")
@@ -105,9 +105,63 @@ class TestAgentEndpoint:
         assert resp.status_code == 200
 
 
-class TestMindMaxAPIMetadata:
-    def test_api_title(self, app):
-        assert app.title == "MindMax Core API"
+class TestDeepFlexEndpoints:
+    def test_dispatch_returns_200(self, client):
+        resp = client.post("/deepflex/dispatch", json={
+            "command_id": "cmd-test-1",
+            "capsule": "deepagent",
+            "payload": {"query": "test"},
+        })
+        assert resp.status_code == 200
+
+    def test_dispatch_returns_command_id(self, client):
+        resp = client.post("/deepflex/dispatch", json={
+            "command_id": "cmd-test-2",
+            "capsule": "wealthbridge",
+            "payload": {"query": "credit analysis"},
+        })
+        assert resp.json()["command_id"] == "cmd-test-2"
+
+    def test_dispatch_status_is_accepted(self, client):
+        resp = client.post("/deepflex/dispatch", json={
+            "command_id": "cmd-test-3",
+            "capsule": "deepagent",
+            "payload": {},
+        })
+        assert resp.json()["status"] == "accepted"
+
+    def test_dispatch_capsule_is_echoed(self, client):
+        resp = client.post("/deepflex/dispatch", json={
+            "command_id": "cmd-test-4",
+            "capsule": "prediction_engine",
+            "payload": {},
+        })
+        assert resp.json()["capsule"] == "prediction_engine"
+
+    def test_dispatch_missing_command_id_returns_422(self, client):
+        resp = client.post("/deepflex/dispatch", json={"capsule": "deepagent"})
+        assert resp.status_code == 422
+
+    def test_dispatch_missing_capsule_returns_422(self, client):
+        resp = client.post("/deepflex/dispatch", json={"command_id": "x"})
+        assert resp.status_code == 422
+
+    def test_status_returns_200(self, client):
+        resp = client.get("/deepflex/status")
+        assert resp.status_code == 200
+
+    def test_status_role_is_executor(self, client):
+        resp = client.get("/deepflex/status")
+        assert resp.json()["role"] == "offline-it-executor"
+
+    def test_status_supervisor_is_deepflex(self, client):
+        resp = client.get("/deepflex/status")
+        assert resp.json()["supervisor"] == "deepflex"
+
+
+class TestArgusNodeMetadata:
+    def test_api_title_reflects_argus_role(self, app):
+        assert app.title == "Argus Prime — Execution Node API"
 
     def test_api_version(self, app):
         assert app.version == "1.0.0"
