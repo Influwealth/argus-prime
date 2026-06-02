@@ -1,6 +1,11 @@
 from typing import Any
 
 
+# ---------------------------------------------------------------------------
+# ArgusRuntime router — used by main.py / ArgusRuntime._dispatch()
+# Returns a full routing decision dict consumed by the dispatch layer.
+# ---------------------------------------------------------------------------
+
 def route(task: str) -> dict[str, Any]:
     """Return the Argus routing decision for a natural-language task."""
     lowered = task.lower()
@@ -129,3 +134,28 @@ def llm_doc_action(task: str) -> str:
     if "write" in task:
         return "generate"
     return "run"
+
+
+# ---------------------------------------------------------------------------
+# CapsuleRouter — used by the MindMax API layer (POST /agent, POST /deepflex/dispatch)
+# Returns a simple capsule name string for the HTTP execution surface.
+# ---------------------------------------------------------------------------
+
+class CapsuleRouter:
+    def __init__(self):
+        self.routes = {
+            "credit": "wealthbridge",
+            "simulation": "mindmax",
+            "outreach": "bridgebuilder",
+            "quantum": "argus-prime",
+            "predict": "prediction_engine",
+            "risk": "prediction_engine",
+            "invoice": "wealthbridge",
+            "cashflow": "wealthbridge",
+        }
+
+    def predict_route(self, query: str) -> str:
+        for keyword, capsule in self.routes.items():
+            if keyword in query.lower():
+                return capsule
+        return "deepagent"

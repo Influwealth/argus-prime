@@ -1,0 +1,20 @@
+capsule:
+  name: wealthbridge
+  version: "1.0"
+  author: "Argus Prime Agent"
+  description: |
+    WealthBridge OS — matches users to credit cards, grants, contracts, and housing
+    aid using high-dimensional tensor logic and Google Data Commons data.
+    Also provides invoice generation and cashflow projection powered by the
+    Prediction Engine capsule.
+  entrypoint: agents/argus/wealthbridge.py
+  dependencies:
+    - agents/vaultgemma/secure_comm.py
+    - quantum_internet/quantum_adapter.py
+    - agents/prediction_engine/capsule.py
+  triggers:
+    - credit_analysis
+    - grant_match
+    - housing_aid
+    - invoice
+    - cashflow
