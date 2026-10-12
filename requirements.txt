@@ -1,5 +1,8 @@
 # Production dependencies for Argus Prime
 
-# Please list your production dependencies here.
-# Example:
-# package-name==version
+# HTTP server (Phase 3 — Argus API)
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+
+# HTTP client (Phase 2 — DeepFlex integration)
+requests>=2.31.0
